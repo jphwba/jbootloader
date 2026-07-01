@@ -1,0 +1,20 @@
+CODE_OFFSET             equ 0x8
+DATA_OFFSET             equ 0x10
+
+STAGE2_SEGMENT          equ 0x0000
+STAGE2_OFFSET           equ 0x8000
+STAGE2_SECTORS          equ 8
+STAGE2_START_SECTOR     equ 2
+
+KERNEL_LOAD_SEG         equ 0x1000
+KERNEL_SECTORS          equ 64
+KERNEL_START_SECTOR     equ STAGE2_START_SECTOR + STAGE2_SECTORS
+KERNEL_START_ADDRESS    equ 0x100000
+
+MMAP_BUFFER_ADDR        equ 0x9000
+MMAP_ENTRY_SIZE         equ 24
+MMAP_MAX_ENTRIES        equ 32
+
+BOOTINFO_ADDR           equ 0x9400
+
+STACK_TOP_PM            equ 0x90000
