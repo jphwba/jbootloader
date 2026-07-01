@@ -34,3 +34,6 @@ clean:
 	rm -f ./build/kernel.asm.os
 	rm -f ./build/kernel.os
 	rm -f ./build/completeKernel.o
+
+run: all
+	qemu-system-x86_64 -drive format=raw,file=./bin/os.bin
