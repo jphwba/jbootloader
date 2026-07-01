@@ -14,7 +14,7 @@ typedef struct {
     uint64_t length;
     uint32_t type;
     uint32_t acpi_ext;
-} _attribute_((packed)) MemoryMapEntry;
+} __attribute__((packed)) MemoryMapEntry;
 
 void kernel_main(BootInfo* info);
 

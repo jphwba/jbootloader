@@ -8,8 +8,8 @@ KERNEL_MAX_BYTES = $(shell echo $$(($(KERNEL_SECTORS) * 512)))
 all: dirs
 	nasm -f bin ./src/stage1.asm -o ./bin/stage1.bin
 	nasm -f bin ./src/stage2.asm -o ./bin/stage2.bin
-	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.O8
-	i686-elf-gcc -I./src $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.O8
+	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
+	i686-elf-gcc -I./src $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
 	i686-elf-ld -g -relocatable $(FILES) -o ./build/completeKernel.o
 	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O8 -nostdlib ./build/completeKernel.o
 

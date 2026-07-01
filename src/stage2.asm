@@ -1,6 +1,6 @@
 [BITS 16]
 
-%include "config.inc"
+%include "src/config.inc"
 
 [ORG STAGE2_OFFSET]
 
@@ -154,7 +154,7 @@ print_string:
     ret
 
 boot_drive: db 0
-mmapcount: dw 0
+mmap_count: dw 0
 
 dap:
     db 0x10

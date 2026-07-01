@@ -1,7 +1,7 @@
 [BITS 16]
 [ORG 0x7C00]
 
-%include "config.inc"
+%include "src/config.inc"
 
 start:
     cli
@@ -37,24 +37,24 @@ disk_error:
 disk_read:
     pusha
     mov di, 3
-.retry:
+disk_read.retry:
     push ax
     push dx
     mov ah, 0x02
     int 0x13
     pop dx
     pop ax
-    jnc .done
+    jnc disk_read.done
     dec di
-    jz .fail
+    jz disk_read.fail
     xor ah, ah
     int 0x13
-    jmp .retry
-.fail:
+    jmp disk_read.retry
+disk_read.fail:
     stc
     popa
-    retry
-.done:
+    jmp disk_read.retry
+disk_read.done:
     clc
     popa
     ret
