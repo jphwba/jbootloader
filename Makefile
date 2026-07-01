@@ -1,3 +1,6 @@
+PREFIX = $(HOME)/opt/cross/bin/
+CC = $(PREFIX)i686-elf-gcc
+LD = $(PREFIX)i686-elf-ld
 FILES = ./build/kernel.asm.o ./build/kernel.o
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -O8 -Iinc
 
@@ -9,9 +12,9 @@ all: dirs
 	nasm -f bin ./src/stage1.asm -o ./bin/stage1.bin
 	nasm -f bin ./src/stage2.asm -o ./bin/stage2.bin
 	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
-	i686-elf-gcc -I./src $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
-	i686-elf-ld -g -relocatable $(FILES) -o ./build/completeKernel.o
-	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O8 -nostdlib ./build/completeKernel.o
+	$(CC) -I./src $(FLAGS) -std=gnu99 -c ./src/kernel.c -o ./build/kernel.o
+	$(LD) -g -relocatable $(FILES) -o ./build/completeKernel.o
+	$(CC) $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O8 -nostdlib ./build/completeKernel.o
 
 	@ksize=$$(stat -c%s ./bin/kernel.bin); \
 	if [ $$ksize -gt $(KERNEL_MAX_BYTES) ]; then \
@@ -22,7 +25,7 @@ all: dirs
 	rm -f ./bin/os.bin
 	cat ./bin/stage1.bin ./bin/stage2.bin ./bin/kernel.bin > ./bin/os.bin
 	truncate -s $$(( (1 + $(STAGE2_SECTORS) + $(KERNEL_SECTORS)) * 512 )) ./bin/os.bin
-
+	
 dirs:
 	mkdir -p ./bin ./build
 
