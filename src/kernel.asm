@@ -3,6 +3,7 @@
 global _start
 extern kernel_main
 
+;Bootlaoder jumps here
 _start:
     push ebx
     call kernel_main
