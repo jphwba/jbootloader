@@ -54,6 +54,6 @@ void isr_handler(registers_t regs) {
 
     __asm__ volatile ("cli");
     for (;;) {
-        __asm__ volatile ("htl");
+        __asm__ volatile ("hlt");
     }
 }

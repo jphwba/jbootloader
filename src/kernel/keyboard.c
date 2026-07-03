@@ -43,7 +43,7 @@ static void keyboard_handler(registers_t regs) {
 }
 
 void keyboard_init(void) {
-    irq_installer_handler(1, keyboard_handler);
+    irq_install_handler(1, keyboard_handler);
     pic_clear_mask(1);
 }
 

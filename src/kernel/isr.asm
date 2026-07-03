@@ -1,4 +1,4 @@
-[BITS32]
+[BITS 32]
 
 extern isr_handler
 
@@ -6,16 +6,16 @@ extern isr_handler
 global isr%1
 isr%1:
     cli
-    push dw 0
-    push dw %1
+    push dword 0
+    push dword %1
     jmp isr_common_stub
 %endmacro
 
 %macro ISR_ERR 1
-global ist%1
+global isr%1
 isr%1:
     cli
-    push dw %1
+    push dword %1
     jmp isr_common_stub
 %endmacro
 
@@ -58,7 +58,7 @@ isr_common_stub:
     push eax
     mov ax, 0x10
     mov ds, ax
-    mos es, ax
+    mov es, ax
     mov fs, ax
     mov gs, ax
 

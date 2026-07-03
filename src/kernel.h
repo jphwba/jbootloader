@@ -5,7 +5,9 @@
 typedef struct {
     uint32_t boot_drive;
     uint32_t mmap_entry_count;
-    uint32_t mmap_addr;
+    // physical address of E820 entry array
+    uint32_t mmap_addr; 
+    // bytes
     uint32_t kernel_size;
 } BootInfo;
 

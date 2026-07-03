@@ -16,7 +16,7 @@ void irq_handler(registers_t regs) {
 
     isr_t handler = irq_routines[irq];
     if(handler) {
-        handler(regs)
+        handler(regs);
     }
     pic_send_eoi(irq);
 }

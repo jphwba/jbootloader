@@ -56,7 +56,7 @@ extern void irq13(void);
 extern void irq14(void);
 extern void irq15(void);
 
-void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8 flags) {
+void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
     idt[num].base_low = base & 0xFFFF;
     idt[num].base_high = (base >> 16) & 0xFFFF;
     idt[num].sel = sel;
@@ -124,5 +124,5 @@ void idt_install(void) {
     idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
 
-    __asm__ volatile__ ("lidt (%0)" : : "r"(&idtp));
+    __asm__ volatile ("lidt (%0)" : : "r"(&idtp));
 }

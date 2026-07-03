@@ -6,8 +6,8 @@ extern irq_handler
 global irq%1
 irq%1:
     cli
-    push dw 0
-    push dw %2
+    push dword 0
+    push dword %2
     jmp irq_common_stub
 %endmacro
 
