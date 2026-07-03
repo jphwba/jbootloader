@@ -12,11 +12,11 @@ start:
     mov sp, 0x7C00
     sti
 
-    mov [boot_drive], dl
-
+    mov [boot_drive], dl            ; BIOS hands the boot drive and saves it in DL
+    ; print short message
     mov si, msgstg1
     call print_string
-
+    ; load stage2
     mov bx, STAGE2_OFFSET
     mov es, ax
     mov dh, 0x00
@@ -33,12 +33,12 @@ disk_error:
     call print_string
     cli
     hlt
-
+    ; reads AL sectors starting at CHS on drive DL into ES:BX
 disk_read:
     pusha
-    mov di, 3
+    mov di, 3       ; retry count
 disk_read.retry:
-    push ax
+    push ax         ; INT 13h clobbers AL
     push dx
     mov ah, 0x02
     int 0x13
@@ -47,7 +47,7 @@ disk_read.retry:
     jnc disk_read.done
     dec di
     jz disk_read.fail
-    xor ah, ah
+    xor ah, ah      ; AH = 0 reset disk system then retry
     int 0x13
     jmp disk_read.retry
 disk_read.fail:

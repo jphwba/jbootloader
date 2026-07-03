@@ -1,3 +1,5 @@
+; loaded via stage1 at 0x0000:0x8000
+
 [BITS 16]
 
 %include "src/config.inc"
@@ -5,7 +7,7 @@
 [ORG STAGE2_OFFSET]
 
 stage2_start:
-    mov [boot_drive], dl
+    mov [boot_drive], dl        ; DL still holds boot drive
 
     mov si, msgstg2
     call print_string
@@ -16,7 +18,7 @@ stage2_start:
     call print_string
 
 
-
+    ; load kernel
     mov eax, KERNEL_START_SECTOR
     mov cx, KERNEL_SECTORS
     mov bx, KERNEL_LOAD_SEG
@@ -54,6 +56,8 @@ disk_error:
 halt:
     cli
     hlt
+
+; verify BIOS INT 13h extensions are on the bootdrive
 
 check_lba_ext:
     pusha
@@ -106,11 +110,11 @@ disk_read_lba:
 enable_a20:
     pusha
     mov ax, 0x2401
-    int 0x15
+    int 0x15            ; enable A20 function
 
     in al, 0x92
-    and al, 0xFE
-    or al, 0x02
+    and al, 0xFE        ; keep bit 0 clear
+    or al, 0x02         ; set bit 1 to enable A20 gate
     out 0x92, al
     popa
     ret
@@ -118,23 +122,23 @@ enable_a20:
 detect_memory:
     pusha
     xor ebx, ebx
-    xor bp, bp
+    xor bp, bp                  ; entries found so far
     mov di, MMAP_BUFFER_ADDR
 .loop:
     mov eax, 0xE820
     mov ecx, MMAP_ENTRY_SIZE
-    mov edx, 0x534D4150
-    mov dword [es:di + 20], 1
+    mov edx, 0x534D4150         ; SMAP
+    mov dword [es:di + 20], 1   ; default ACPI extended attribute bit
     int 0x15
-    jc .done
+    jc .done                    ; error/end of list
     cmp eax, 0x534D4150
-    jne .done
+    jne .done                   ; BIOS doesnt support call
     cmp bp, MMAP_MAX_ENTRIES
     jae .done
     inc bp
     add di, MMAP_ENTRY_SIZE
     test ebx, ebx
-    jz .done
+    jz .done                    ; EBX=0 means it is last entry
     jmp .loop
 .done:
     mov [mmap_count], dap
@@ -157,16 +161,16 @@ boot_drive: db 0
 mmap_count: dw 0
 
 dap:
-    db 0x10
-    db 0
+    db 0x10         ; packet size
+    db 0            ; reserved
 dap_count:
-    dw 0
+    dw 0            ; sector count
 dap_offset:
-    dw 0
+    dw 0            ; destination offset
 dap_segment:
-    dw 0
+    dw 0            ; destination segment
 dap_lba:
-    dq 0
+    dq 0            ; starting LBA
 
 msgstg2:            db "[JBootloader] stage2: initialising...", 13, 10, 0
 msg_loadingkern:    db "[JBootloader] loading kernel...", 13, 10, 0
@@ -176,18 +180,18 @@ msg_pmode:          db "[JBootloader] switching to protected mode...", 13, 10, 0
 msg_disk_error:     db "[JBootloader] disk read failed", 13, 10, 0
 msg_no_ext:         db "[JBootloader] BIOS LBA extensions not supported", 13, 10, 0
 
-
+; GDT
 gdt_start:
     dd 0x0
     dd 0x0
-
+    ; code segment
     dw 0xFFFF
     dw 0x0000
     db 0x00
     db 10011010b
     db 11001111b
     db 0x00
-
+    ; data segment
     dw 0xFFFF
     dw 0x0000
     db 0x00
@@ -219,12 +223,12 @@ PModeMain:
     mov edi, BOOTINFO_ADDR
     xor eax, eax
     mov al, [boot_drive]
-    mov [edi], eax
+    mov [edi], eax                              ; boot_drive
     xor eax, eax
     mov ax, [mmap_count]
-    mov [edi + 4], eax
-    mov dword [edi + 8], MMAP_BUFFER_ADDR
-    mov dword [edi + 12], KERNEL_SECTORS * 512
+    mov [edi + 4], eax                          ; mmap entry count
+    mov dword [edi + 8], MMAP_BUFFER_ADDR       ; mmap addr
+    mov dword [edi + 12], KERNEL_SECTORS * 512  ; kernel_size
 
     mov ebx, BOOTINFO_ADDR
     jmp CODE_OFFSET:KERNEL_START_ADDRESS
