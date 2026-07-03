@@ -24,7 +24,7 @@ all: dirs
 	nasm -f bin -I src/ ./src/stage2.asm -o ./bin/stage2.bin
 	$(MAKE) $(ASM_OBJECTS) $(C_OBJECTS)
 	i686-elf-ld -g -relocatable $(ASM_OBJECTS) $(C_OBJECTS) -o ./build/completeKernel.o
-	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O9 -nostdlib ./build/completeKernel.o
+	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/completeKernel.o
 
 	@ksize = $$(stat -c%s ./bin/kernel.bin); \
 	if [ $$ksize -gt $(KERNEL_MAX_BYTES) ]; then \

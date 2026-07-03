@@ -8,7 +8,7 @@ STAGE2_START_SECTOR     equ 2           ; stage1 is sector 1(LBA0) stage2 starts
 ; kernel
 KERNEL_LOAD_SEG         equ 0x1000      ; kernel is first loaded to phys 0x10000 (real mode)
 KERNEL_SECTORS          equ 64          ; 64 * 512 = 32 KiB for kernel image
-KERNEL_START_SECTOR     equ STAGE2_START_SECTOR + STAGE2_SECTORS
+KERNEL_START_SECTOR     equ (STAGE2_START_SECTOR - 1) + STAGE2_SECTORS
 KERNEL_START_ADDRESS    equ 0x100000    ; final linked address the kernel runs at
 
 ; scratch data areas used for stage2
