@@ -11,7 +11,8 @@ C_SOURCES = src/kernel.c \
 			src/kernel/irq.c \
 			src/kernel/pic.c \
 			src/kernel/pit.c \
-			src/kernel/keyboard.c
+			src/kernel/keyboard.c \
+			src/kernel/printf.c
 
 ASM_OBJ_SOURCES = src/kernel.asm \
 				  src/kernel/isr.asm \

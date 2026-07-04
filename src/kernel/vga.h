@@ -24,10 +24,16 @@ enum vga_colour {
 
 void terminal_init(void);
 void terminal_set_colour(uint8_t fg, uint8_t bg);
+void terminal_get_colour(uint8_t* fg, uint8_t* bg);
 void terminal_putchar(char c);
 void terminal_write(const char* data, size_t size);
 void terminal_writestring(const char* data);
 void terminal_write_hex(uint32_t value);
 void terminal_write_dec(uint32_t value);
+void terminal_clear(void);
+void terminal_set_cursor(size_t row, size_t col);
+void terminal_get_cursor(size_t* row, size_t* col);
+void terminal_enable_cursor(uint8_t start_scanline, uint8_t end_scanline);
+void terminal_disable_cursor(void);
 
 #endif

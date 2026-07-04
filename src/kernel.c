@@ -4,20 +4,14 @@
 #include "kernel/pic.h"
 #include "kernel/pit.h"
 #include "kernel/keyboard.h"
+#include "kernel/printf.h"
 #define PIC1_OFFSET 0x20
 #define PIC2_OFFSET 0x28
 
 void kernel_main(BootInfo* info){
     terminal_init();
     terminal_writestring("JBootloader kernel\n");
-    terminal_writestring("boot_drive=");
-    terminal_write_hex(info->boot_drive);
-    terminal_writestring(" mmap_entries=");
-    terminal_write_dec(info->mmap_entry_count);
-    terminal_writestring(" kernel_size=");
-    terminal_write_dec(info->kernel_size);
-    terminal_writestring(" bytes\n\n");
-
+    kprintf("boot_drive=0x%x mmap_entries=%u kernel_size=%u bytes\n\n", info->boot_drive, info->mmap_entry_count, info->kernel_size);
     idt_install();
     pic_remap(PIC1_OFFSET, PIC2_OFFSET);
     pit_init(100);
