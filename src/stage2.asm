@@ -141,7 +141,7 @@ detect_memory:
     jz .done                    ; EBX=0 means it is last entry
     jmp .loop
 .done:
-    mov [mmap_count], dap
+    mov [mmap_count], bp
     popa
     ret
 print_string:

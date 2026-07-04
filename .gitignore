@@ -212,3 +212,4 @@ node_modules
 template\ assembly
 
 bin/
+Makefile.old
