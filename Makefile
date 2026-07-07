@@ -1,7 +1,7 @@
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -Wextra -O0 -Isrc
 
 STAGE2_SECTORS = 8
-KERNEL_SECTORS = 64
+KERNEL_SECTORS = 100
 KERNEL_MAX_BYTES = $(shell echo $$(($(KERNEL_SECTORS) * 512)))
 
 C_SOURCES = src/kernel.c \
@@ -12,7 +12,8 @@ C_SOURCES = src/kernel.c \
 			src/kernel/pic.c \
 			src/kernel/pit.c \
 			src/kernel/keyboard.c \
-			src/kernel/printf.c
+			src/kernel/printf.c \
+			src/kernel/pmm.c
 
 ASM_OBJ_SOURCES = src/kernel.asm \
 				  src/kernel/isr.asm \
@@ -27,7 +28,7 @@ all: dirs
 	i686-elf-ld -g -relocatable $(ASM_OBJECTS) $(C_OBJECTS) -o ./build/completeKernel.o
 	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/completeKernel.o
 
-	@ksize = $$(stat -c%s ./bin/kernel.bin); \
+	@ksize=$$(stat -c%s ./bin/kernel.bin); \
 	if [ $$ksize -gt $(KERNEL_MAX_BYTES) ]; then \
 		echo "kernel.bin ($$ksize bytes) exceeds KERNEL_SECTORS budget ($(KERNEL_MAX_BYTES) bytes) - raise KERNEL_SECTORS in the Makefile and config.inc"; \
 		exit 1; \

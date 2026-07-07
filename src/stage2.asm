@@ -121,6 +121,9 @@ enable_a20:
 
 detect_memory:
     pusha
+    push es
+    xor ax, ax
+    mov es, ax
     xor ebx, ebx
     xor bp, bp                  ; entries found so far
     mov di, MMAP_BUFFER_ADDR
