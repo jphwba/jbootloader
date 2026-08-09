@@ -43,7 +43,7 @@ void pmm_init(BootInfo* info) {
     MemoryMapEntry* entries = (MemoryMapEntry*)(uintptr_t)info->mmap_addr;
     uint64_t highest = 0;
     for (uint32_t i = 0; i < info->mmap_entry_count; i++) {
-        uint64_t end = entries[i].base + entries[1].length;
+        uint64_t end = entries[i].base + entries[i].length;
         if (end > highest) {
             highest = end;
         }
@@ -86,6 +86,28 @@ void pmm_free_page(void* addr) {
         bitmap_clear(frame);
         used_frames--;
     }
+}
+void* pmm_alloc_pages(uint32_t count) {
+    if (count == 0 || count > total_frames) {
+        return (void*)0;
+    }
+    uint32_t run = 0;
+    for(uint32_t frame = 0; frame < total_frames; frame++) {
+        if(bitmap_test(frame)) {
+            run = 0;
+            continue;
+        }
+        run++;
+        if (run == count) {
+            uint32_t start = frame - count + 1;
+            for (uint32_t f = start; f <= frame; f++) {
+                bitmap_set(f);
+            }
+            used_frames += count;
+            return (void*)(uintptr_t)(start * PMM_PAGE_SIZE);
+        }
+    }
+    return (void*)0;
 }
 uint32_t pmm_get_total_frames(void) { return total_frames; }
 uint32_t pmm_get_used_frames(void) { return used_frames; }

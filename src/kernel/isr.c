@@ -43,7 +43,15 @@ void isr_handler(registers_t regs) {
     terminal_write_dec(regs.int_no);
     terminal_writestring(", error code ");
     terminal_write_hex(regs.err_code);
-    terminal_writestring(")\n eip=");
+    terminal_writestring(")\n");
+    if(regs.int_no == 14) {
+        uint32_t cr2;
+        __asm__ volatile ("mov %%cr2, %0" : "=r"(cr2));
+        terminal_writestring(" faulting address=");
+        terminal_write_hex(cr2);
+        terminal_writestring("\n");
+    }
+    terminal_writestring(" eip=");
     terminal_write_hex(regs.eip);
     terminal_writestring(" cs=");
     terminal_write_hex(regs.cs);

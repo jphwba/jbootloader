@@ -6,6 +6,8 @@
 #include "kernel/keyboard.h"
 #include "kernel/printf.h"
 #include "kernel/pmm.h"
+#include "kernel/paging.h"
+#include "kernel/heap.h"
 #define PIC1_OFFSET 0x20
 #define PIC2_OFFSET 0x28
 
@@ -26,6 +28,21 @@ void kernel_main(BootInfo* info){
     kprintf("test alloc: page1=0x%x page2=0x%x\n", (unsigned int)(uintptr_t)a, (unsigned int)(uintptr_t)b);
     pmm_free_page(a);
     kprintf("freed page1, now %u KiB free\n", (unsigned int)(pmm_get_free_frames() * PMM_PAGE_SIZE / 1024));
+    paging_init();
+    terminal_writestring("Pagign enabled, first 16Mib mapped)\n");
+    heap_init();
+    char* s = (char*)kmalloc(32);
+    int* n = (int*)kmalloc(sizeof(int));
+    if(s && n) {
+        *n = 42;
+        s[0] = 'h'; s[1] = 'i'; s[2] = 0;
+        kprintf("heap test: s=\"%s\" n=%d (s=0x&x n=0x%x)\n",
+        s, *n, (unsigned int)(uintptr_t)s, (unsigned int)(uintptr_t)n);
+        kfree(s);
+        kfree(n);
+    } else {
+        terminal_writestring("heap test: allocation failed\n");
+    }
     terminal_writestring("Type something:\n");
 
     for (;;) {
