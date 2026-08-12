@@ -145,6 +145,7 @@ detect_memory:
     jmp .loop
 .done:
     mov [mmap_count], bp
+    pop es
     popa
     ret
 print_string:
