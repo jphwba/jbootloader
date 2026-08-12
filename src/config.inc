@@ -11,6 +11,8 @@ KERNEL_SECTORS          equ 100         ; 100 * 512 = 50 KiB for kernel image
 KERNEL_START_SECTOR     equ (STAGE2_START_SECTOR - 1) + STAGE2_SECTORS
 KERNEL_START_ADDRESS    equ 0x100000    ; final linked address the kernel runs at
 
+FS_START_SECTOR         equ KERNEL_START_SECTOR + KERNEL_SECTORS
+
 ; scratch data areas used for stage2
 MMAP_BUFFER_ADDR        equ 0x9000      ; BIOS E820 memory map entries
 MMAP_ENTRY_SIZE         equ 24          ; bytes per E820 entry we request
