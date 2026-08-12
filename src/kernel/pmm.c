@@ -43,6 +43,9 @@ void pmm_init(BootInfo* info) {
     MemoryMapEntry* entries = (MemoryMapEntry*)(uintptr_t)info->mmap_addr;
     uint64_t highest = 0;
     for (uint32_t i = 0; i < info->mmap_entry_count; i++) {
+        if (entries[i].type !=1) {
+            continue;
+        }
         uint64_t end = entries[i].base + entries[i].length;
         if (end > highest) {
             highest = end;
