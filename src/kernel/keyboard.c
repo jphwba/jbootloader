@@ -5,6 +5,10 @@
 
 #define KBD_DATA_PORT 0x60
 #define KBD_BUFFER_SIZE 256
+#define SC_LSHIFT 0x2A
+#define SC_RSHIFT 0x36
+#define SC_CAPSLOCK 0x3A
+#define SC_RELEASE_BIT 0x80
 
 static char kbd_buffer[KBD_BUFFER_SIZE];
 static volatile size_t kbd_head = 0;
