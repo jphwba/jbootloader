@@ -15,11 +15,16 @@ C_SOURCES = src/kernel.c \
 			src/kernel/printf.c \
 			src/kernel/pmm.c \
 			src/kernel/paging.c \
-			src/kernel/heap.c
+			src/kernel/heap.c \
+			src/kernel/task.c \
+			src/kernel/ata.c \
+			src/kernel/fat16.c \
+			src/kernel/shell.c
 
 ASM_OBJ_SOURCES = src/kernel.asm \
 				  src/kernel/isr.asm \
-				  src/kernel/irq.asm
+				  src/kernel/irq.asm \
+				  src/kernel/task_switch.asm
 C_OBJECTS = $(patsubst src/%.c, build/%.o, $(C_SOURCES))
 ASM_OBJECTS = $(patsubst src/%.asm, build/%.asm.o, $(ASM_OBJ_SOURCES))
 
@@ -39,6 +44,15 @@ all: dirs
 	rm -f ./bin/os.bin
 	cat ./bin/stage1.bin ./bin/stage2.bin ./bin/kernel.bin > ./bin/os.bin
 	truncate -s $$(( (1 + $(STAGE2_SECTORS) + $(KERNEL_SECTORS)) * 512 )) ./bin/os.bin
+
+fs: dirs
+	rm -f ./bin/fs.img
+	dd if=/dev/zero of=./bin/fs.img bs=512 count=$(FS_SECTORS) status=none
+	mkfs.fat -F 16 -n JBOOTFS ./bin/fs.img > /dev/null
+	echo "JBootloader kernel fs, fat16" > ./build/README.TXT
+	echo "JBootloader 12/08/2026 at 11:30pm ish" > ./build/VERSION.TXT
+	mcopy -i ./bin/fs.img ./build/README.TXT ::README.TXT
+	mcopy -i ./bin/fs.img ./build/VERSION.TXT ::VERSION.TXT
 
 build/%.o: src/%.c
 	@mkdir -p $(dir $@)
