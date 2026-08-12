@@ -8,8 +8,30 @@
 #include "kernel/pmm.h"
 #include "kernel/paging.h"
 #include "kernel/heap.h"
+#include "kernel/task.h"
+#include "kernel/shell.h"
+
 #define PIC1_OFFSET 0x20
 #define PIC2_OFFSET 0x28
+
+static void task_spinner(void) {
+    static const char frames[] = {'|', '/', '-', '\\'};
+    int i = 0;
+    for (;;) {
+        terminal_put_at(0, 79, frames[i % 4]);
+        i++;
+        pit_sleep_ms(250);
+    }
+}
+
+static void task_counter(void) {
+    unsigned int n = 0;
+    for (;;) {
+        terminal_put_at(0, 78, (char)('0' + (n % 10)));
+        n++;
+        pit_sleep_ms(500);
+    }
+}
 
 void kernel_main(BootInfo* info){
     terminal_init();
@@ -23,33 +45,14 @@ void kernel_main(BootInfo* info){
     terminal_writestring("IDT Installed, PIC remapped, PIT and keyboard ready \n");
     pmm_init(info);
     kprintf("PMM: %u KiB total, %u KiB free, &u KiB used\n", (unsigned int)(pmm_get_total_frames() * PMM_PAGE_SIZE / 1024), (unsigned int)(pmm_get_free_frames() * PMM_PAGE_SIZE / 1024), (unsigned int)(pmm_get_used_frames() * PMM_PAGE_SIZE / 1024));
-    void* a = pmm_alloc_page();
-    void* b = pmm_alloc_page();
-    kprintf("test alloc: page1=0x%x page2=0x%x\n", (unsigned int)(uintptr_t)a, (unsigned int)(uintptr_t)b);
-    pmm_free_page(a);
-    kprintf("freed page1, now %u KiB free\n", (unsigned int)(pmm_get_free_frames() * PMM_PAGE_SIZE / 1024));
     paging_init();
-    terminal_writestring("Pagign enabled, first 16Mib mapped)\n");
+    terminal_writestring("Paging enabled, first 16Mib mapped)\n");
     heap_init();
-    char* s = (char*)kmalloc(32);
-    int* n = (int*)kmalloc(sizeof(int));
-    if(s && n) {
-        *n = 42;
-        s[0] = 'h'; s[1] = 'i'; s[2] = 0;
-        kprintf("heap test: s=\"%s\" n=%d (s=0x&x n=0x%x)\n",
-        s, *n, (unsigned int)(uintptr_t)s, (unsigned int)(uintptr_t)n);
-        kfree(s);
-        kfree(n);
-    } else {
-        terminal_writestring("heap test: allocation failed\n");
+    terminal_writestring("kernel heap ready");
+    scheduler_init("shell");
+    task_create("spinner", task_spinner);
+    task_create("counter", task_counter);
+    pit_set_tick_hook(scheduler_tick);
+    terminal_writestring("Scheduler running started background tasks\n\n");
+    shell_run();
     }
-    terminal_writestring("Type something:\n");
-
-    for (;;) {
-        char c = keyboard_getchar();
-        if (c != 0) {
-            terminal_putchar(c);
-        }
-        __asm__ volatile ("hlt");
-    }
-}
