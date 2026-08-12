@@ -35,5 +35,6 @@ void terminal_set_cursor(size_t row, size_t col);
 void terminal_get_cursor(size_t* row, size_t* col);
 void terminal_enable_cursor(uint8_t start_scanline, uint8_t end_scanline);
 void terminal_disable_cursor(void);
+void terminal_put_at(size_t row, size_t col, char c);
 
 #endif

@@ -72,6 +72,13 @@ void terminal_disable_cursor(void) {
     outb(0x3D5, 0x20);
 }
 
+void terminal_put_at(size_t row, size_t col, char c) {
+    if (row >= VGA_HEIGHT || col >= VGA_WIDTH) {
+        return;
+    }
+    terminal_buffer[row * VGA_WIDTH + col] = vga_entry((unsigned char)c, terminal_colour);
+}
+
 void terminal_set_colour(uint8_t fg, uint8_t bg) {
     terminal_colour = vga_entry_colour((enum vga_colour)fg, (enum vga_colour)bg);
 }
