@@ -3,6 +3,7 @@ FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -Wextra -
 STAGE2_SECTORS = 8
 KERNEL_SECTORS = 100
 KERNEL_MAX_BYTES = $(shell echo $$(($(KERNEL_SECTORS) * 512)))
+FS_SECTORS = 32768
 
 C_SOURCES = src/kernel.c \
 			src/kernel/vga.c \
@@ -69,6 +70,6 @@ clean:
 	rm -rf ./bin ./build
 
 run: all
-	qemu-system-i386 -drive format=raw,file=./bin/os.bin
+	qemu-system-i386 -drive format=raw,file=./bin/os.bin -drive format=raw,file=./bin/fs.img
 
 .PHONY: all dirs clean run
