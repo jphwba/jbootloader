@@ -33,6 +33,10 @@ uint32_t pit_get_ticks(void) {
 }
 
 uint32_t pit_get_frequency() {
+    return configured_hz;
+}
+
+uint32_t pit_get_uptime_ms(void) {
     uint32_t whole_seconds_ms = (ticks / configured_hz) * 1000;
     uint32_t remainder_ms = ((ticks % configured_hz) * 1000) / configured_hz;
     return whole_seconds_ms + remainder_ms;

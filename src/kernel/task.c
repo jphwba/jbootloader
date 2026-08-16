@@ -8,7 +8,7 @@ static uint32_t num_tasks = 0;
 static uint32_t current_task = 0;
 
 static void task_trampoline(void (*entry)(void)) {
-    __asm__ colatile ("sti");
+    __asm__ volatile ("sti");
     entry();
     for (;;) {
         __asm__ volatile ("hlt");
