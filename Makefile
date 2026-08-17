@@ -45,6 +45,8 @@ all: dirs
 	rm -f ./bin/os.bin
 	cat ./bin/stage1.bin ./bin/stage2.bin ./bin/kernel.bin > ./bin/os.bin
 	truncate -s $$(( (1 + $(STAGE2_SECTORS) + $(KERNEL_SECTORS)) * 512 )) ./bin/os.bin
+	$(MAKE) fs
+	cat ./bin/fs.img >> ./bin/os.bin
 
 fs: dirs
 	rm -f ./bin/fs.img
@@ -72,4 +74,4 @@ clean:
 run: all
 	qemu-system-i386 -drive format=raw,file=./bin/os.bin -drive format=raw,file=./bin/fs.img
 
-.PHONY: all dirs clean run
+.PHONY: all dirs clean run fs

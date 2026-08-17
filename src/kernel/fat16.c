@@ -3,6 +3,7 @@
 #include "heap.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "printf.h"
 
 #define FS_START_LBA 109
 #define SECTOR_SIZE 512
@@ -42,8 +43,15 @@ static uint16_t rd_u16(const uint8_t*b, int off){
 
 int fat16_init(void) {
     uint8_t boot[SECTOR_SIZE];
-    if (ata_read_sectors(FS_START_LBA, 1, boot) != 0) { return -1; }
-    if (boot[510] != 0x55 || boot[511] != 0xAA) { return -1; }
+    int rc = ata_read_sectors(FS_START_LBA, 1, boot);
+    kprintf("fat16: ata_read_sectors rc=%d sig=%x%x b0=%x b1=%x b2=%x\n",
+            rc, boot[510], boot[511], boot[0], boot[1], boot[2]);
+    if (rc != 0) {
+        return -1;
+    }
+    if (boot[510] != 0x55 || boot[511] != 0xAA) {
+        return -1; /* no boot signature, not a FAT volume at all */
+    }
 
     bytes_per_sector = rd_u16(boot, 11);
     sectors_per_cluster = boot[13];

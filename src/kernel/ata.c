@@ -49,7 +49,7 @@ int ata_read_sectors(uint32_t lba, uint8_t count, void *buffer) {
             return -1;
         }
         for (int i = 0; i < 256; i++) {
-            out[s * 256 + i] = inb(ATA_DATA);
+            out[s * 256 + i] = inw(ATA_DATA);
         }
     }
     return 0;
