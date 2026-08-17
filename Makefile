@@ -1,8 +1,9 @@
 FLAGS = -g -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -Wextra -O0 -Isrc
 
 STAGE2_SECTORS = 8
-KERNEL_SECTORS = 64
+KERNEL_SECTORS = 100
 KERNEL_MAX_BYTES = $(shell echo $$(($(KERNEL_SECTORS) * 512)))
+FS_SECTORS = 32768
 
 C_SOURCES = src/kernel.c \
 			src/kernel/vga.c \
@@ -11,11 +12,20 @@ C_SOURCES = src/kernel.c \
 			src/kernel/irq.c \
 			src/kernel/pic.c \
 			src/kernel/pit.c \
-			src/kernel/keyboard.c
+			src/kernel/keyboard.c \
+			src/kernel/printf.c \
+			src/kernel/pmm.c \
+			src/kernel/paging.c \
+			src/kernel/heap.c \
+			src/kernel/task.c \
+			src/kernel/ata.c \
+			src/kernel/fat16.c \
+			src/kernel/shell.c
 
 ASM_OBJ_SOURCES = src/kernel.asm \
 				  src/kernel/isr.asm \
-				  src/kernel/irq.asm
+				  src/kernel/irq.asm \
+				  src/kernel/task_switch.asm
 C_OBJECTS = $(patsubst src/%.c, build/%.o, $(C_SOURCES))
 ASM_OBJECTS = $(patsubst src/%.asm, build/%.asm.o, $(ASM_OBJ_SOURCES))
 
@@ -26,7 +36,7 @@ all: dirs
 	i686-elf-ld -g -relocatable $(ASM_OBJECTS) $(C_OBJECTS) -o ./build/completeKernel.o
 	i686-elf-gcc $(FLAGS) -T ./src/linkerscript.ld -o ./bin/kernel.bin -ffreestanding -O0 -nostdlib ./build/completeKernel.o
 
-	@ksize = $$(stat -c%s ./bin/kernel.bin); \
+	@ksize=$$(stat -c%s ./bin/kernel.bin); \
 	if [ $$ksize -gt $(KERNEL_MAX_BYTES) ]; then \
 		echo "kernel.bin ($$ksize bytes) exceeds KERNEL_SECTORS budget ($(KERNEL_MAX_BYTES) bytes) - raise KERNEL_SECTORS in the Makefile and config.inc"; \
 		exit 1; \
@@ -35,6 +45,17 @@ all: dirs
 	rm -f ./bin/os.bin
 	cat ./bin/stage1.bin ./bin/stage2.bin ./bin/kernel.bin > ./bin/os.bin
 	truncate -s $$(( (1 + $(STAGE2_SECTORS) + $(KERNEL_SECTORS)) * 512 )) ./bin/os.bin
+	$(MAKE) fs
+	cat ./bin/fs.img >> ./bin/os.bin
+
+fs: dirs
+	rm -f ./bin/fs.img
+	dd if=/dev/zero of=./bin/fs.img bs=512 count=$(FS_SECTORS) status=none
+	mkfs.fat -F 16 -n JBOOTFS ./bin/fs.img > /dev/null
+	echo "JBootloader kernel fs, fat16" > ./build/README.TXT
+	echo "JBootloader 12/08/2026 at 11:30pm ish" > ./build/VERSION.TXT
+	mcopy -i ./bin/fs.img ./build/README.TXT ::README.TXT
+	mcopy -i ./bin/fs.img ./build/VERSION.TXT ::VERSION.TXT
 
 build/%.o: src/%.c
 	@mkdir -p $(dir $@)
@@ -51,6 +72,6 @@ clean:
 	rm -rf ./bin ./build
 
 run: all
-	qemu-system-i386 -drive format=raw,file=./bin/os.bin
+	qemu-system-i386 -drive format=raw,file=./bin/os.bin -drive format=raw,file=./bin/fs.img
 
-.PHONY: all dirs clean run
+.PHONY: all dirs clean run fs

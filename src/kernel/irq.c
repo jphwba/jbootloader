@@ -14,9 +14,11 @@ void irq_uninstall_handler(uint8_t irq) {
 void irq_handler(registers_t regs) {
     uint8_t irq = (uint8_t)(regs.int_no - 32);
 
+    pic_send_eoi(irq);
+
     isr_t handler = irq_routines[irq];
     if(handler) {
         handler(regs);
     }
-    pic_send_eoi(irq);
+
 }
