@@ -168,7 +168,7 @@ static void dispatch(char* line) {
     }
 
     if (line[0] == 0) return;
-    if (streq(line, "clear")) terminal_clear();
+    if (streq(line, "help")) cmd_help();
     else if (streq(line, "clear")) terminal_clear();
     else if (streq(line, "mem")) cmd_mem();
     else if (streq(line, "uptime")) cmd_uptime();
