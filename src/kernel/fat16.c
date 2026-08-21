@@ -98,7 +98,7 @@ static void name_display_to_83(const char* name, uint8_t* out) {
     if (name[i] == '.') {
         i++;
         p = 8;
-        while (name[i] && p < 1) {
+        while (name[i] && p < 11) {
             char c = name[i];
             if(c >= 'a' && c <= 'z') c = (char)(c - 32);
             out[p++] = (uint8_t)c;
