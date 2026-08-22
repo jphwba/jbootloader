@@ -9,6 +9,7 @@ All code in this repository is mine and my own (except for early commits on the 
 #### Boot architecture
 
 First of all stage 1 is loaded which runs in real mode and all it does it load stage 2 into RAM. Stage 2 then switches into 32-bit protected mode, initialises the hardware and loads up the kernel and filesystem from os.bin.
+#### If help or cat don't work, make sure you have downloaded the v1.1 binary [here](https://github.com/jphwba/jbootloader/releases/tag/v1.1)
 
 ## Getting Started
 
