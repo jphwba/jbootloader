@@ -32,7 +32,37 @@ brew install nasm gcc qemu make
 
 ```bash
 sudo apt update
-sudo apt install nasm gcc qemu-system-x86 make libattr1 libc6-i386 binutils
+sudo apt install nasm gcc qemu-system-x86 make libattr1 libc6-i386 binutils wget build-essential unzip gcc-multilib g++-multilib
+
+#Set Variables
+export PREFIX="$HOME/opt/cross"
+export TARGET=i686-elf
+export PATH="$PREFIX/bin:$PATH"
+
+# downloading binutils and gcc
+wget https://ftp.gnu.org/gnu/binutils/binutils-2.46.1.tar.gz
+wget https://gcc.gnu.org/pub/gcc/releases/gcc-16.1.0/gcc-16.1.0.tar.gz
+mkdir -p $HOME/opt/cross
+tar -xf binutils-2.46.1.tar.gz -C $HOME/opt/cross
+tar -xf gcc-16.1.0.tar.gz -C $HOME/opt/cross
+
+# building binutils
+cd $HOME/opt/cross/binutils-2.46.1/
+mkdir build && cd build
+../configure
+make && sudo make install
+
+# building gcc compiler for i686-elf
+cd ../../gcc-16.1.0
+mkdir build && cd build
+# Make sure that you are in the same terminal from the start or you will need to run the export commands again
+../configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers --enable-initfini-array --disable-hosted-libstdcxx
+make all-gcc
+make all-target-libgcc
+make all-target-libstdc++-v3
+make install-gcc
+make install-target-libgcc
+make install-target-libstdc++-v3
 ```
 
 > **Note:** You can install only `qemu-system-x86` if you're not building.
